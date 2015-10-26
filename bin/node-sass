@@ -2,7 +2,7 @@
 
 var Emitter = require('events').EventEmitter,
     forEach = require('async-foreach').forEach,
-    Gaze = require('gaze'),
+    chokidar = require('chokidar'),
     grapher = require('sass-graph'),
     meow = require('meow'),
     util = require('util'),
@@ -240,11 +240,11 @@ function watch(options, emitter) {
     watch.push(i);
   }
 
-  var gaze = new Gaze();
-  gaze.add(watch);
-  gaze.on('error', emitter.emit.bind(emitter, 'error'));
+  var watcher = chokidar.watch(watch);
+  watcher.on('error', emitter.emit.bind(emitter, 'error'));
 
-  gaze.on('changed', function(file) {
+  watcher.on('change', function(file) {
+    console.log(" ** FILE IS ", file);
     var files = [file];
     graph.visitAncestors(file, function(parent) {
       files.push(parent);
